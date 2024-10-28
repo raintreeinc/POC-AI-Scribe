@@ -12,7 +12,7 @@ import { MedicalScribeJob } from '@aws-sdk/client-transcribe';
 import ModalLoader from '@/components/SuspenseLoader/ModalLoader';
 import { useAudio } from '@/hooks/useAudio';
 import { useNotificationsContext } from '@/store/notifications';
-import { IAuraClinicalDocOutput, IAuraClinicalDocOutputSection, IAuraTranscriptOutput } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutput, IAuraTranscriptOutput, IAuraClinicalDocOutputSection } from '@/types/HealthScribe';
 import { getHealthScribeJob } from '@/utils/HealthScribeApi';
 import { getObject, getS3Object } from '@/utils/S3Api';
 
