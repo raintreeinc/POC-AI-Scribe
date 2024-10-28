@@ -12,7 +12,7 @@ import { MedicalScribeJob } from '@aws-sdk/client-transcribe';
 import ModalLoader from '@/components/SuspenseLoader/ModalLoader';
 import { useAudio } from '@/hooks/useAudio';
 import { useNotificationsContext } from '@/store/notifications';
-import { IAuraClinicalDocOutput, IAuraTranscriptOutput } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutput, IAuraClinicalDocOutputSection, IAuraTranscriptOutput } from '@/types/HealthScribe';
 import { getHealthScribeJob } from '@/utils/HealthScribeApi';
 import { getObject, getS3Object } from '@/utils/S3Api';
 
@@ -33,6 +33,26 @@ export default function Conversation() {
 
     const [clinicalDocument, setClinicalDocument] = useState<IAuraClinicalDocOutput | null>(null);
     const [transcriptFile, setTranscriptFile] = useState<IAuraTranscriptOutput | null>(null);
+    
+    enum SoapSections {
+        Subjective = 'SUBJECTIVE',
+        Objective = 'OBJECTIVE',
+        Assessment = 'ASSESSMENT',
+        Plan = 'PLAN'
+    };
+
+    const SOAP_MAP:{ [key: string]: string } = {
+        CHIEF_COMPLAINT: SoapSections.Plan,
+        HISTORY_OF_PRESENT_ILLNESS: SoapSections.Objective,
+        PAST_MEDICAL_HISTORY: SoapSections.Objective,
+        PAST_FAMILY_HISTORY: SoapSections.Objective,
+        PAST_SOCIAL_HISTORY: SoapSections.Objective,
+        REVIEW_OF_SYSTEMS: SoapSections.Objective,
+        PHYSICAL_EXAMINATION: SoapSections.Subjective,
+        DIAGNOSTIC_TESTING: SoapSections.Assessment,
+        ASSESSMENT: SoapSections.Assessment,
+        PLAN: SoapSections.Plan
+    };
 
     const [
         wavesurfer,
@@ -47,6 +67,29 @@ export default function Conversation() {
     ] = useAudio();
 
     useEffect(() => {
+        function convertToSOAPResults(result: IAuraClinicalDocOutput) {
+            const soapResult: IAuraClinicalDocOutput = {ClinicalDocumentation: {Sections: []}} 
+            const sections = result.ClinicalDocumentation.Sections || [];
+            const sectionsMap:{ [key: string]: IAuraClinicalDocOutputSection } = {};
+            for (const section of sections) {
+                const soapType = SOAP_MAP[section.SectionName];
+                if (!sectionsMap[soapType]) {
+                    sectionsMap[soapType] = {
+                        SectionName: soapType,
+                        Summary: []
+                    }
+                }
+                sectionsMap[soapType].Summary.push(...section.Summary);
+            }
+
+            soapResult.ClinicalDocumentation.Sections.push(sectionsMap[SoapSections.Subjective]);
+            soapResult.ClinicalDocumentation.Sections.push(sectionsMap[SoapSections.Objective]);
+            soapResult.ClinicalDocumentation.Sections.push(sectionsMap[SoapSections.Assessment]);
+            soapResult.ClinicalDocumentation.Sections.push(sectionsMap[SoapSections.Plan]);
+
+            return soapResult;
+        }
+
         async function getJob(conversationName: string) {
             try {
                 setJobLoading(true);
@@ -60,9 +103,11 @@ export default function Conversation() {
 
                 // Get Clinical Document from result S3 URL
                 const clinicalDocumentUri = medicalScribeJob.MedicalScribeOutput?.ClinicalDocumentUri;
-                const clinicalDocumentRsp = await getObject(getS3Object(clinicalDocumentUri || ''));
-                setClinicalDocument(JSON.parse((await clinicalDocumentRsp?.Body?.transformToString()) || ''));
-
+                const bucketInfo = getS3Object(clinicalDocumentUri || '');
+                const clinicalDocumentRsp = await getObject(bucketInfo);
+                const clinicalDocumentResult = JSON.parse((await clinicalDocumentRsp?.Body?.transformToString()) || '');
+                const soapClinicalDocument = convertToSOAPResults(clinicalDocumentResult);
+                setClinicalDocument(soapClinicalDocument);
                 // Get Transcript File from result S3 URL
                 const transcriptFileUri = medicalScribeJob.MedicalScribeOutput?.TranscriptFileUri;
                 const transcriptFileRsp = await getObject(getS3Object(transcriptFileUri || ''));
