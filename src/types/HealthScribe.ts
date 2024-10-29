@@ -16,6 +16,7 @@ export interface IEvidence {
     }[];
 
     SummarizedSegment: string;
+    OriginalCategory?: string;
 }
 
 export interface IClinicalFields {

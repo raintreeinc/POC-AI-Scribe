@@ -110,7 +110,7 @@ export default function SummarizedConcepts({
                 return (
                     <div key={`insightsSection_${i}`}>
                         <TextContent>
-                            <h3>{toTitleCase(SectionName.replace(/_/g, ' '))}</h3>
+                            <h3 style={{marginTop: '10px'}}>{toTitleCase(SectionName.replace(/_/g, ' '))}</h3>
                         </TextContent>
                         <SummaryListDefault
                             sectionName={SectionName}
