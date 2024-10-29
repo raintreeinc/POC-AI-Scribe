@@ -9,6 +9,7 @@ import { IEvidence } from '@/types/HealthScribe';
 import styles from './SummarizedConcepts.module.css';
 import { ExtractedHealthDataWord } from './SummaryListComponents';
 import { processSummarizedSegment } from './summarizedConceptsUtils';
+import { Icon } from '@cloudscape-design/components';
 
 function NoEntities() {
     return (
@@ -36,8 +37,15 @@ export function SummaryListDefault({
 }: SummaryListDefaultProps) {
     if (summary.length) {
         return (
-            <ul className={styles.summaryList}>
-                {summary.map(({ EvidenceLinks, SummarizedSegment }, sectionIndex) => {
+            <table className={styles.summaryTable}>
+                <thead>
+                    <tr>
+                        <th>Area</th>
+                        <th>Note</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                {summary.map(({ EvidenceLinks, SummarizedSegment, OriginalCategory }, sectionIndex) => {
                     if (SummarizedSegment === '') return false;
 
                     // Check if the segment is a section header
@@ -62,67 +70,101 @@ export function SummaryListDefault({
                     if (summaryExtractedHealthData) {
                         const sectionExtractedData = summaryExtractedHealthData[sectionIndex];
                         return (
-                            <div key={`${sectionName}_${sectionIndex}`}>
+                            <>
                                 {sectionHeaderWordLength > 0 && (
-                                    <div className={styles.summaryListItemSubHeader}>
-                                        {sectionExtractedData.words
-                                            .slice(0, sectionHeaderWordLength)
-                                            .map(({ word, linkedId }, wordIndex) => (
-                                                <ExtractedHealthDataWord
-                                                    key={`${sectionName}_${sectionIndex}_${wordIndex}`}
-                                                    linkedId={linkedId}
-                                                    sectionExtractedData={sectionExtractedData}
-                                                    word={word}
-                                                    acceptableConfidence={acceptableConfidence}
-                                                />
-                                            ))}
-                                    </div>
+                                    <tr>
+                                        <td colSpan={3}>
+                                            <div>
+                                                {sectionExtractedData.words
+                                                    .slice(0, sectionHeaderWordLength)
+                                                    .map(({ word, linkedId }, wordIndex) => (
+                                                        <ExtractedHealthDataWord
+                                                            key={`${sectionName}_${sectionIndex}_${wordIndex}`}
+                                                            linkedId={linkedId}
+                                                            sectionExtractedData={sectionExtractedData}
+                                                            word={word}
+                                                            acceptableConfidence={acceptableConfidence}
+                                                        />
+                                                    ))}
+                                            </div>
+                                        </td>
+                                    </tr>
                                 )}
-                                <li className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
-                                    <div
-                                        onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
-                                        className={styles.summarizedSegment}
-                                        style={summaryItemDivStyle}
-                                    >
-                                        {sectionExtractedData.words
-                                            .slice(sectionHeaderWordLength)
-                                            .map(({ word, linkedId }, wordIndex) => {
-                                                if (word === '-' && wordIndex <= 1) return false;
+                                <tr className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
+                                    <td>
+                                        {OriginalCategory}
+                                    </td>
+                                    <td>
+                                        <div
+                                            onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
+                                            className={styles.summarizedSegment}
+                                            style={summaryItemDivStyle}
+                                        >
+                                            {sectionExtractedData.words
+                                                .slice(sectionHeaderWordLength)
+                                                .map(({ word, linkedId }, wordIndex) => {
+                                                    if (word === '-' && wordIndex <= 1) return false;
 
-                                                return (
-                                                    <ExtractedHealthDataWord
-                                                        key={`${sectionName}_${sectionIndex}_${wordIndex}`}
-                                                        linkedId={linkedId}
-                                                        sectionExtractedData={sectionExtractedData}
-                                                        word={word}
-                                                        acceptableConfidence={acceptableConfidence}
-                                                    />
-                                                );
-                                            })}
-                                    </div>
-                                </li>
-                            </div>
+                                                    return (
+                                                        <ExtractedHealthDataWord
+                                                            key={`${sectionName}_${sectionIndex}_${wordIndex}`}
+                                                            linkedId={linkedId}
+                                                            sectionExtractedData={sectionExtractedData}
+                                                            word={word}
+                                                            acceptableConfidence={acceptableConfidence}
+                                                        />
+                                                    );
+                                                })}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <Icon name="edit" size="medium" />
+                                        </div>
+                                        <div>
+                                            <Icon name="remove" size="medium" />
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+                            </>
                         );
                     } else {
                         return (
-                            <div key={`${sectionName}_${sectionIndex}`}>
+                            <>
                                 {sectionHeader && (
-                                    <div className={styles.summaryListItemSubHeader}>{sectionHeader}</div>
+                                    <tr>
+                                        <td colSpan={3} className={styles.summaryListItemSubHeader}>{sectionHeader}</td>
+                                    </tr>
                                 )}
-                                <li className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
-                                    <div
-                                        onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
-                                        className={styles.summarizedSegment}
-                                        style={summaryItemDivStyle}
-                                    >
-                                        {processSummarizedSegment(SummarizedSegment)}
-                                    </div>
-                                </li>
-                            </div>
+                                <tr className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
+                                    <td>
+                                        {OriginalCategory}
+                                    </td>
+                                    <td width='100%'>
+                                        <div
+                                            onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
+                                            className={styles.summarizedSegment}
+                                            style={summaryItemDivStyle}
+                                        >
+                                            {processSummarizedSegment(SummarizedSegment)}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <Icon name="edit" size="medium" />
+                                        </div>
+                                        <div>
+                                            <Icon name="remove" size="medium" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </>
+                            
                         );
                     }
                 })}
-            </ul>
+            </table>
         );
     } else {
         return <NoEntities />;

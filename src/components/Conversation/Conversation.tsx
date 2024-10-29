@@ -42,12 +42,12 @@ export default function Conversation() {
     };
 
     const SOAP_MAP:{ [key: string]: string } = {
-        CHIEF_COMPLAINT: SoapSections.Plan,
+        CHIEF_COMPLAINT: SoapSections.Subjective,
         HISTORY_OF_PRESENT_ILLNESS: SoapSections.Objective,
         PAST_MEDICAL_HISTORY: SoapSections.Objective,
         PAST_FAMILY_HISTORY: SoapSections.Objective,
         PAST_SOCIAL_HISTORY: SoapSections.Objective,
-        REVIEW_OF_SYSTEMS: SoapSections.Objective,
+        REVIEW_OF_SYSTEMS: SoapSections.Subjective,
         PHYSICAL_EXAMINATION: SoapSections.Subjective,
         DIAGNOSTIC_TESTING: SoapSections.Assessment,
         ASSESSMENT: SoapSections.Assessment,
@@ -79,7 +79,7 @@ export default function Conversation() {
                         Summary: []
                     }
                 }
-                sectionsMap[soapType].Summary.push(...section.Summary);
+                sectionsMap[soapType].Summary.push(...section.Summary.map(summary => ({...summary, OriginalCategory: section.SectionName})));
             }
 
             soapResult.ClinicalDocumentation.Sections.push(sectionsMap[SoapSections.Subjective]);
