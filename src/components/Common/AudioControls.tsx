@@ -3,7 +3,6 @@
 import React from 'react';
 
 // Cloudscape
-import Box from '@cloudscape-design/components/box';
 import Button from '@cloudscape-design/components/button';
 import Container from '@cloudscape-design/components/container';
 import Icon from '@cloudscape-design/components/icon';
@@ -115,22 +114,7 @@ export default function AudioControls({
             <div className={styles.playerControlInline}>{buttons}</div>
         ) : (
             <div className={styles.playerControl}>
-                <Container>
-                    <div className={styles.closeButton}>
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setShowControls(false);
-                            }}
-                            variant="icon"
-                            iconName="close"
-                        />
-                    </div>
-                    <div className={styles.ctrlHeading}>
-                        <Box variant="h4">Audio Controls</Box>
-                    </div>
-                    {buttons}
-                </Container>
+                <Container>{buttons}</Container>
             </div>
         );
     } else {

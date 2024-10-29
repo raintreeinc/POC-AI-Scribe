@@ -16,7 +16,6 @@ import { IAuraClinicalDocOutput, IAuraTranscriptOutput, IAuraClinicalDocOutputSe
 import { getHealthScribeJob } from '@/utils/HealthScribeApi';
 import { getObject, getS3Object } from '@/utils/S3Api';
 
-import { ConversationHeader } from './ConversationHeader';
 import LeftPanel from './LeftPanel';
 import RightPanel from './RightPanel';
 import TopPanel from './TopPanel';
@@ -132,10 +131,7 @@ export default function Conversation() {
     }, []);
 
     return (
-        <ContentLayout
-            headerVariant={'high-contrast'}
-            header={<ConversationHeader jobDetails={jobDetails} setShowOutputModal={setShowOutputModal} />}
-        >
+        <ContentLayout headerVariant={'high-contrast'}>
             {showOutputModal && (
                 <Suspense fallback={<ModalLoader />}>
                     <ViewOutput
