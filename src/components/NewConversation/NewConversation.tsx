@@ -141,7 +141,7 @@ export default function NewConversation() {
             Tags: [
                 { Key: 'firstName', Value: firstName },
                 { Key: 'lastName', Value: lastName },
-                { Key: 'date', Value: date },
+                { Key: 'appointment', Value: date },
                 { Key: 'duration', Value: duration },
             ],
             DataAccessRoleArn: amplifyCustom.healthScribeServiceRole,
