@@ -3,26 +3,75 @@
 import React from 'react';
 
 import Box from '@cloudscape-design/components/box';
+import DatePicker from '@cloudscape-design/components/date-picker';
 import FormField from '@cloudscape-design/components/form-field';
 import Grid from '@cloudscape-design/components/grid';
 import Input from '@cloudscape-design/components/input';
 import RadioGroup from '@cloudscape-design/components/radio-group';
+import Select from '@cloudscape-design/components/select';
 import TextContent from '@cloudscape-design/components/text-content';
 
 import styles from './NewConversation.module.css';
 import { AudioDetails, AudioSelection } from './types';
 
-type InputNameProps = {
-    jobName: string;
-    setJobName: React.Dispatch<React.SetStateAction<string>>;
+type InputFirstNameProps = {
+    firstName: string;
+    setFirstName: React.Dispatch<React.SetStateAction<string>>;
 };
-export function InputName({ jobName, setJobName }: InputNameProps) {
+export function InputFirstName({ firstName, setFirstName }: InputFirstNameProps) {
     return (
-        <FormField
-            label="Job name"
-            description="The name can be up to 200 characters long. Valid characters are a-z, A-Z, 0-9, . (period), _ (underscore), and – (hyphen)."
-        >
-            <Input onChange={({ detail }) => setJobName(detail.value)} placeholder="Name" value={jobName} />
+        <FormField label="First Name">
+            <Input onChange={({ detail }) => setFirstName(detail.value)} placeholder="First Name" value={firstName} />
+        </FormField>
+    );
+}
+
+type InputLastNameProps = {
+    lastName: string;
+    setLastName: React.Dispatch<React.SetStateAction<string>>;
+};
+export function InputLastName({ lastName, setLastName }: InputLastNameProps) {
+    return (
+        <FormField label="Last Name">
+            <Input onChange={({ detail }) => setLastName(detail.value)} placeholder="Last Name" value={lastName} />
+        </FormField>
+    );
+}
+type InputDurationProps = {
+    duration: string;
+    setDuration: React.Dispatch<React.SetStateAction<string>>;
+};
+export function InputDuration({ duration, setDuration }: InputDurationProps) {
+    return (
+        <FormField label="Duration">
+            <Select
+                selectedOption={{ label: '', value: duration.toString() }}
+                onChange={({ detail }) => setDuration(detail.selectedOption.value ?? '')}
+                options={[
+                    { label: '30 Minutes', value: '30 Minutes' },
+                    { label: '60 Minutes', value: '60 Minutes' },
+                    { label: '90 Minutes', value: '90 Minutes' },
+                ]}
+            />
+        </FormField>
+    );
+}
+
+type InputDateProps = {
+    date: string;
+    setDate: React.Dispatch<React.SetStateAction<string>>;
+};
+export function InputDate({ date, setDate }: InputDateProps) {
+    return (
+        <FormField label="Date" constraintText="Use YYYY/MM/DD format.">
+            <DatePicker
+                onChange={({ detail }) => setDate(detail.value)}
+                value={date}
+                openCalendarAriaLabel={(selectedDate) =>
+                    'Choose certificate expiry date' + (selectedDate ? `, selected date is ${selectedDate}` : '')
+                }
+                placeholder="YYYY/MM/DD"
+            />
         </FormField>
     );
 }

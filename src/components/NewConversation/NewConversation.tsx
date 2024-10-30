@@ -31,28 +31,31 @@ import sleep from '@/utils/sleep';
 import amplifyCustom from '../../aws-custom.json';
 import AudioRecorder from './AudioRecorder';
 import { AudioDropzone } from './Dropzone';
-import { AudioDetailSettings, AudioIdentificationType, InputName } from './FormComponents';
+import { InputDate, InputDuration, InputFirstName, InputLastName } from './FormComponents';
 import styles from './NewConversation.module.css';
 import { verifyJobParams } from './formUtils';
-import { AudioDetails, AudioSelection } from './types';
 
 export default function NewConversation() {
     const { updateProgressBar } = useNotificationsContext();
     const navigate = useNavigate();
+    const timeStamp = new Date().getTime();
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // is job submitting
     const [formError, setFormError] = useState<string | React.ReactElement[]>('');
-    const [jobName, setJobName] = useState<string>(''); // form - job name
-    const [audioSelection, setAudioSelection] = useState<AudioSelection>('speakerPartitioning'); // form - audio selection
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
+    const [duration, setDuration] = useState<string>(''); // form - duration
+    const [date, setDate] = useState<string>(''); // form - date
+    const audioSelection = 'speakerPartitioning'; // form - audio selection
     // form - audio details
-    const [audioDetails, setAudioDetails] = useState<AudioDetails>({
+    const audioDetails = {
         speakerPartitioning: {
             maxSpeakers: 2,
         },
         channelIdentification: {
             channel1: 'CLINICIAN',
         },
-    });
+    };
     const [filePath, setFilePath] = useState<File>(); // only one file is allowd from react-dropzone. NOT an array
     const [outputBucket, getUploadMetadata] = useS3(); // outputBucket is the Amplify bucket, and uploadMetadata contains uuid4
 
@@ -84,7 +87,7 @@ export default function NewConversation() {
         const loadedMb = Math.round((loaded || 1) / 1024 / 1024);
         const totalMb = Math.round((total || 1) / 1024 / 1024);
         updateProgressBar({
-            id: `New HealthScribe Job: ${jobName}`,
+            id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
             value: value,
             description: `Uploaded part ${part}, ${loadedMb}MB / ${totalMb}MB`,
         });
@@ -134,7 +137,13 @@ export default function NewConversation() {
         };
 
         const jobParams: StartMedicalScribeJobRequest = {
-            MedicalScribeJobName: jobName,
+            MedicalScribeJobName: `${firstName}_${lastName}_${timeStamp}`,
+            Tags: [
+                { Key: 'firstName', Value: firstName },
+                { Key: 'lastName', Value: lastName },
+                { Key: 'appointment', Value: date },
+                { Key: 'duration', Value: duration },
+            ],
             DataAccessRoleArn: amplifyCustom.healthScribeServiceRole,
             OutputBucketName: outputBucket,
             Media: {
@@ -155,7 +164,7 @@ export default function NewConversation() {
 
         // Add initial progress flash message
         updateProgressBar({
-            id: `New HealthScribe Job: ${jobName}`,
+            id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
             value: 0,
             description: 'Upload to S3 in progress...',
         });
@@ -169,7 +178,7 @@ export default function NewConversation() {
             });
         } catch (e) {
             updateProgressBar({
-                id: `New HealthScribe Job: ${jobName}`,
+                id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
                 type: 'error',
                 value: 0,
                 description: 'Uploading files to S3 failed',
@@ -183,7 +192,7 @@ export default function NewConversation() {
             const startJob = await startMedicalScribeJob(jobParams);
             if (startJob?.MedicalScribeJob?.MedicalScribeJobStatus) {
                 updateProgressBar({
-                    id: `New HealthScribe Job: ${jobName}`,
+                    id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
                     type: 'success',
                     value: 100,
                     description: 'HealthScribe job submitted',
@@ -195,7 +204,7 @@ export default function NewConversation() {
                 navigate('/conversations');
             } else {
                 updateProgressBar({
-                    id: `New HealthScribe Job: ${jobName}`,
+                    id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
                     type: 'info',
                     value: 100,
                     description: 'Unable to confirm HealthScribe job submission',
@@ -204,7 +213,7 @@ export default function NewConversation() {
             }
         } catch (e) {
             updateProgressBar({
-                id: `New HealthScribe Job: ${jobName}`,
+                id: `New HealthScribe Job: ${firstName}_${lastName}_${timeStamp}`,
                 type: 'error',
                 value: 0,
                 description: 'Submitting job to HealthScribe failed',
@@ -251,7 +260,11 @@ export default function NewConversation() {
                                         <Spinner />
                                     </Button>
                                 ) : (
-                                    <Button formAction="submit" variant="primary" disabled={!filePath}>
+                                    <Button
+                                        formAction="submit"
+                                        variant="primary"
+                                        disabled={!filePath || !date || !firstName || !lastName || !duration}
+                                    >
                                         Submit
                                     </Button>
                                 )}
@@ -259,16 +272,10 @@ export default function NewConversation() {
                         }
                     >
                         <SpaceBetween direction="vertical" size="xl">
-                            <InputName jobName={jobName} setJobName={setJobName} />
-                            <AudioIdentificationType
-                                audioSelection={audioSelection}
-                                setAudioSelection={setAudioSelection}
-                            />
-                            <AudioDetailSettings
-                                audioSelection={audioSelection}
-                                audioDetails={audioDetails}
-                                setAudioDetails={setAudioDetails}
-                            />
+                            <InputFirstName firstName={firstName} setFirstName={setFirstName} />
+                            <InputLastName lastName={lastName} setLastName={setLastName} />
+                            <InputDate date={date} setDate={setDate} />
+                            <InputDuration duration={duration} setDuration={setDuration} />
                             <FormField
                                 label={
                                     <SpaceBetween direction="horizontal" size="xs">
