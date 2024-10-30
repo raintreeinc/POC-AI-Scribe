@@ -2,15 +2,18 @@
 // SPDX-License-Identifier: MIT-0
 import React, { useEffect, useMemo, useState } from 'react';
 
+import Button from '@cloudscape-design/components/button';
 import TextContent from '@cloudscape-design/components/text-content';
 
 import toast from 'react-hot-toast';
 import WaveSurfer from 'wavesurfer.js';
 
+import NewSection from '@/components/Section/NewSection';
 import { ExtractedHealthData, SummarySectionEntityMapping } from '@/types/ComprehendMedical';
-import { IAuraClinicalDocOutputSection, ITranscriptSegments } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutput, IAuraClinicalDocOutputSection, ITranscriptSegments } from '@/types/HealthScribe';
 import toTitleCase from '@/utils/toTitleCase';
 
+import { SOAP_MAP } from '../Conversation';
 import { HighlightId } from '../types';
 import { SummaryListDefault } from './SummaryList';
 import { SECTION_ORDER } from './sectionOrder';
@@ -26,6 +29,9 @@ type SummarizedConceptsProps = {
         [key: string]: ITranscriptSegments;
     };
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
+    clinicalDocumentUri: string;
+    setClinicalDocument: React.Dispatch<React.SetStateAction<IAuraClinicalDocOutput | null>>;
+    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
 };
 
 export default function SummarizedConcepts({
@@ -36,9 +42,17 @@ export default function SummarizedConcepts({
     setHighlightId,
     segmentById,
     wavesurfer,
+    clinicalDocumentUri,
+    setClinicalDocument,
+    handleAddSectionToClinicalDocument,
 }: SummarizedConceptsProps) {
     const [currentId, setCurrentId] = useState(0);
     const [currentSegment, setCurrentSegment] = useState<string>('');
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const toggleDialog = () => {
+        setIsDialogOpen(!isDialogOpen);
+    };
 
     // Unset current segment when the highlight is removed, i.e. the current audio time is outside the summarization
     useEffect(() => {
@@ -102,6 +116,8 @@ export default function SummarizedConcepts({
         );
     }, [sections]);
 
+    const sectionNames = Object.keys(SOAP_MAP);
+
     return (
         <>
             {sortedSections.map(({ SectionName, Summary }, i) => {
@@ -110,7 +126,10 @@ export default function SummarizedConcepts({
                 return (
                     <div key={`insightsSection_${i}`}>
                         <TextContent>
-                            <h3 style={{marginTop: '10px'}}>{toTitleCase(SectionName.replace(/_/g, ' '))}</h3>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <h3 style={{ marginTop: '10px' }}>{toTitleCase(SectionName.replace(/_/g, ' '))}</h3>
+                                <Button iconName="add-plus" variant="icon" onClick={toggleDialog} />
+                            </div>
                         </TextContent>
                         <SummaryListDefault
                             sectionName={SectionName}
@@ -123,6 +142,14 @@ export default function SummarizedConcepts({
                     </div>
                 );
             })}
+            <NewSection
+                isOpen={isDialogOpen}
+                onClose={toggleDialog}
+                sectionNames={sectionNames}
+                clinicalDocumentUri={clinicalDocumentUri}
+                setClinicalDocument={setClinicalDocument}
+                handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
+            />
         </>
     );
 }

@@ -1,6 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 import { Progress, Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getCurrentUser } from 'aws-amplify/auth';
@@ -82,6 +82,12 @@ export async function getObject(getObjectProps: GetObjectProps) {
     const s3Client = await getS3Client();
     const getObjectCmd = new GetObjectCommand(getObjectProps);
     return await s3Client.send(getObjectCmd);
+}
+
+export async function putObject(putObjectProps: PutObjectCommandInput) {
+    const s3Client = await getS3Client();
+    const putObjectCmd = new PutObjectCommand(putObjectProps);
+    return await s3Client.send(putObjectCmd);
 }
 
 type MultipartUploadProps = {
