@@ -263,7 +263,7 @@ export default function NewConversation() {
                                     <Button
                                         formAction="submit"
                                         variant="primary"
-                                        disabled={!filePath && !date && !firstName && !lastName && !duration}
+                                        disabled={!filePath || !date || !firstName || !lastName || !duration}
                                     >
                                         Submit
                                     </Button>
