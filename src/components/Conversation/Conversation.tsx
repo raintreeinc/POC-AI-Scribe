@@ -22,7 +22,7 @@ import TopPanel from './TopPanel';
 
 const ViewOutput = lazy(() => import('./ViewOutput'));
 
-enum SoapSections {
+export enum SoapSections {
     Subjective = 'SUBJECTIVE',
     Objective = 'OBJECTIVE',
     Assessment = 'ASSESSMENT',
@@ -107,8 +107,7 @@ export default function Conversation() {
             const clinicalDocumentUri = medicalScribeJob.MedicalScribeOutput?.ClinicalDocumentUri;
             const bucketInfo = getS3Object(clinicalDocumentUri || '');
             const clinicalDocumentRsp = await getObject(bucketInfo);
-            const x = await clinicalDocumentRsp?.Body?.transformToString();
-            const clinicalDocumentResult = JSON.parse((x) || '');
+            const clinicalDocumentResult = JSON.parse((await clinicalDocumentRsp?.Body?.transformToString()) || '');
             const soapClinicalDocument: IAuraClinicalDocOutput = convertToSOAPResults(clinicalDocumentResult);
             setClinicalDocument(soapClinicalDocument);
             // Get Transcript File from result S3 URL
@@ -164,8 +163,6 @@ export default function Conversation() {
         setClinicalDocument((prevClinicalDocument) => {
             if (!prevClinicalDocument || !section) return prevClinicalDocument;
             const updatedDocument = addSectionToClinicalDocument(section, prevClinicalDocument);
-
-            // Save updatedDocument to S3
             if (updatedDocument) {
                 saveClinicalDocument(updatedDocument);
             }
@@ -221,8 +218,6 @@ export default function Conversation() {
                     highlightId={highlightId}
                     setHighlightId={setHighlightId}
                     wavesurfer={wavesurfer}
-                    clinicalDocumentUri={clinicalDocumentUri || ''}
-                    setClinicalDocument={setClinicalDocument}
                     handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
                 />
             </Grid>

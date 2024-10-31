@@ -23,7 +23,7 @@ async function getS3Client() {
  * @param {string} s3Uri An S3 URL, starting with s3:// or https://s3.
  * @returns { Bucket: string, Key: string }
  */
-export function getS3Object(s3Uri: string): { Bucket: string; Key: string; IfModifiedSince?: Date } {
+export function getS3Object(s3Uri: string): { Bucket: string; Key: string } {
     if (s3Uri.startsWith('s3://')) {
         // s3://<bucket name>/<key>
         const inputUrl = new URL(s3Uri.replace(/^s3:\/\//, 'https://'));
@@ -40,7 +40,6 @@ export function getS3Object(s3Uri: string): { Bucket: string; Key: string; IfMod
         return {
             Bucket: inputPath[1],
             Key: inputPath.splice(2).join('/'),
-            //IfModifiedSince: new Date(),
         };
     } else {
         throw new Error(`Unknown S3 URI ${s3Uri}.`);

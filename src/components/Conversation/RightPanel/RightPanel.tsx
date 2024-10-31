@@ -30,8 +30,6 @@ type RightPanelProps = {
     highlightId: HighlightId;
     setHighlightId: React.Dispatch<React.SetStateAction<HighlightId>>;
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
-    clinicalDocumentUri: string;
-    setClinicalDocument: React.Dispatch<React.SetStateAction<IAuraClinicalDocOutput | null>>;
     handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
 };
 
@@ -42,8 +40,6 @@ export default function RightPanel({
     highlightId,
     setHighlightId,
     wavesurfer,
-    clinicalDocumentUri,
-    setClinicalDocument,
     handleAddSectionToClinicalDocument,
 }: RightPanelProps) {
     const [extractingData, setExtractingData] = useState<boolean>(false);
@@ -124,8 +120,6 @@ export default function RightPanel({
                     setHighlightId={setHighlightId}
                     segmentById={segmentById}
                     wavesurfer={wavesurfer}
-                    clinicalDocumentUri={clinicalDocumentUri}
-                    setClinicalDocument={setClinicalDocument}
                     handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
                 />
             </ScrollingContainer>

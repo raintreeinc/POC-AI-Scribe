@@ -142,7 +142,6 @@ export default function NewConversation() {
             },
             ...audioParams,
         };
-        console.log('Job Params:', jobParams);
 
         const verifyParamResults = verifyJobParams(jobParams);
         if (!verifyParamResults.verified) {

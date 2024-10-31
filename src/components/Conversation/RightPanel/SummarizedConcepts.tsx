@@ -10,10 +10,10 @@ import WaveSurfer from 'wavesurfer.js';
 
 import NewSection from '@/components/Section/NewSection';
 import { ExtractedHealthData, SummarySectionEntityMapping } from '@/types/ComprehendMedical';
-import { IAuraClinicalDocOutput, IAuraClinicalDocOutputSection, ITranscriptSegments } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutputSection, ITranscriptSegments } from '@/types/HealthScribe';
 import toTitleCase from '@/utils/toTitleCase';
 
-import { SOAP_MAP } from '../Conversation';
+import { SOAP_MAP, SoapSections } from '../Conversation';
 import { HighlightId } from '../types';
 import { SummaryListDefault } from './SummaryList';
 import { SECTION_ORDER } from './sectionOrder';
@@ -29,8 +29,6 @@ type SummarizedConceptsProps = {
         [key: string]: ITranscriptSegments;
     };
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
-    clinicalDocumentUri: string;
-    setClinicalDocument: React.Dispatch<React.SetStateAction<IAuraClinicalDocOutput | null>>;
     handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
 };
 
@@ -42,8 +40,6 @@ export default function SummarizedConcepts({
     setHighlightId,
     segmentById,
     wavesurfer,
-    clinicalDocumentUri,
-    setClinicalDocument,
     handleAddSectionToClinicalDocument,
 }: SummarizedConceptsProps) {
     const [currentId, setCurrentId] = useState(0);
@@ -116,7 +112,9 @@ export default function SummarizedConcepts({
         );
     }, [sections]);
 
-    const sectionNames = Object.keys(SOAP_MAP);
+    const sectionNames = Object.keys(SOAP_MAP).filter(
+        (section) => section !== SoapSections.Subjective && section !== SoapSections.Objective
+    );
 
     return (
         <>
@@ -146,8 +144,6 @@ export default function SummarizedConcepts({
                 isOpen={isDialogOpen}
                 onClose={toggleDialog}
                 sectionNames={sectionNames}
-                clinicalDocumentUri={clinicalDocumentUri}
-                setClinicalDocument={setClinicalDocument}
                 handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
             />
         </>
