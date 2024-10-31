@@ -23,7 +23,7 @@ async function getS3Client() {
  * @param {string} s3Uri An S3 URL, starting with s3:// or https://s3.
  * @returns { Bucket: string, Key: string }
  */
-export function getS3Object(s3Uri: string): { Bucket: string; Key: string } {
+export function getS3Object(s3Uri: string): { Bucket: string; Key: string; IfModifiedSince?: Date } {
     if (s3Uri.startsWith('s3://')) {
         // s3://<bucket name>/<key>
         const inputUrl = new URL(s3Uri.replace(/^s3:\/\//, 'https://'));
@@ -40,6 +40,7 @@ export function getS3Object(s3Uri: string): { Bucket: string; Key: string } {
         return {
             Bucket: inputPath[1],
             Key: inputPath.splice(2).join('/'),
+            //IfModifiedSince: new Date(),
         };
     } else {
         throw new Error(`Unknown S3 URI ${s3Uri}.`);
@@ -63,6 +64,8 @@ function getDateLastDiscreteInterval() {
 type GetObjectProps = {
     Bucket: string;
     Key: string;
+    QueryString?: string;
+    IfModifiedSince?: Date;
 };
 export async function getPresignedUrl(getObjectProps: GetObjectProps) {
     const s3Client = await getS3Client();
@@ -80,7 +83,12 @@ export async function getPresignedUrl(getObjectProps: GetObjectProps) {
 
 export async function getObject(getObjectProps: GetObjectProps) {
     const s3Client = await getS3Client();
-    const getObjectCmd = new GetObjectCommand(getObjectProps);
+    const getObjectCmd = new GetObjectCommand({
+        ...getObjectProps,
+        ...{
+            ResponseCacheControl: 'no-cache',
+        },
+    });
     return await s3Client.send(getObjectCmd);
 }
 

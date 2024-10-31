@@ -40,6 +40,8 @@ export const SOAP_MAP: { [key: string]: string } = {
     DIAGNOSTIC_TESTING: SoapSections.Assessment,
     ASSESSMENT: SoapSections.Assessment,
     PLAN: SoapSections.Plan,
+    SUBJECTIVE: SoapSections.Subjective,
+    OBJECTIVE: SoapSections.Objective,
 };
 
 export default function Conversation() {
@@ -105,7 +107,8 @@ export default function Conversation() {
             const clinicalDocumentUri = medicalScribeJob.MedicalScribeOutput?.ClinicalDocumentUri;
             const bucketInfo = getS3Object(clinicalDocumentUri || '');
             const clinicalDocumentRsp = await getObject(bucketInfo);
-            const clinicalDocumentResult = JSON.parse((await clinicalDocumentRsp?.Body?.transformToString()) || '');
+            const x = await clinicalDocumentRsp?.Body?.transformToString();
+            const clinicalDocumentResult = JSON.parse((x) || '');
             const soapClinicalDocument: IAuraClinicalDocOutput = convertToSOAPResults(clinicalDocumentResult);
             setClinicalDocument(soapClinicalDocument);
             // Get Transcript File from result S3 URL
