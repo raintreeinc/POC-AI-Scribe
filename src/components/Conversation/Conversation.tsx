@@ -159,10 +159,16 @@ export default function Conversation() {
         return document;
     };
 
-    const handleAddSectionToClinicalDocument = async (section: IAuraClinicalDocOutputSection) => {
+    const updateSectionToClinicalDocument = async (
+        section: IAuraClinicalDocOutputSection,
+        updateFunction: (
+            section: IAuraClinicalDocOutputSection | null,
+            document: IAuraClinicalDocOutput | null
+        ) => IAuraClinicalDocOutput | null
+    ) => {
         setClinicalDocument((prevClinicalDocument) => {
             if (!prevClinicalDocument || !section) return prevClinicalDocument;
-            const updatedDocument = addSectionToClinicalDocument(section, prevClinicalDocument);
+            const updatedDocument = updateFunction(section, prevClinicalDocument);
             if (updatedDocument) {
                 saveClinicalDocument(updatedDocument);
             }
@@ -218,7 +224,9 @@ export default function Conversation() {
                     highlightId={highlightId}
                     setHighlightId={setHighlightId}
                     wavesurfer={wavesurfer}
-                    handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
+                    handleAddSectionToClinicalDocument={(section) =>
+                        updateSectionToClinicalDocument(section, addSectionToClinicalDocument)
+                    }
                 />
             </Grid>
         </ContentLayout>
