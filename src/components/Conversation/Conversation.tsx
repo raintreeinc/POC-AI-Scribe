@@ -40,8 +40,6 @@ export const SOAP_MAP: { [key: string]: string } = {
     DIAGNOSTIC_TESTING: SoapSections.Assessment,
     ASSESSMENT: SoapSections.Assessment,
     PLAN: SoapSections.Plan,
-    SUBJECTIVE: SoapSections.Subjective,
-    OBJECTIVE: SoapSections.Objective,
 };
 
 export default function Conversation() {
@@ -92,6 +90,14 @@ export default function Conversation() {
         return soapResult;
     }
 
+    function isinSOAPFormat(clinicalDocumentResult: IAuraClinicalDocOutput) {
+        const REQUIRED_SECTIONS = Object.values(SoapSections);
+        const sectionNames = clinicalDocumentResult.ClinicalDocumentation.Sections.map(
+            (section) => section.SectionName
+        );
+        return REQUIRED_SECTIONS.every((requiredSection) => sectionNames.includes(requiredSection));
+    }
+
     async function getJob(conversationName: string) {
         try {
             setJobLoading(true);
@@ -107,8 +113,14 @@ export default function Conversation() {
             const clinicalDocumentUri = medicalScribeJob.MedicalScribeOutput?.ClinicalDocumentUri;
             const bucketInfo = getS3Object(clinicalDocumentUri || '');
             const clinicalDocumentRsp = await getObject(bucketInfo);
-            const clinicalDocumentResult = JSON.parse((await clinicalDocumentRsp?.Body?.transformToString()) || '');
-            const soapClinicalDocument: IAuraClinicalDocOutput = convertToSOAPResults(clinicalDocumentResult);
+            const clinicalDocumentResult: IAuraClinicalDocOutput = JSON.parse(
+                (await clinicalDocumentRsp?.Body?.transformToString()) || ''
+            );
+            let soapClinicalDocument: IAuraClinicalDocOutput = clinicalDocumentResult;
+            if (!isinSOAPFormat(clinicalDocumentResult)) {
+                soapClinicalDocument = convertToSOAPResults(clinicalDocumentResult);
+            }
+
             setClinicalDocument(soapClinicalDocument);
             // Get Transcript File from result S3 URL
             const transcriptFileUri = medicalScribeJob.MedicalScribeOutput?.TranscriptFileUri;
@@ -155,7 +167,22 @@ export default function Conversation() {
     ) => {
         if (!document || !section) return document;
 
-        document.ClinicalDocumentation.Sections.push(section);
+        const soapType = SOAP_MAP[section.SectionName];
+        if (!soapType) return document;
+
+        const sections = document.ClinicalDocumentation.Sections || [];
+        let soapSection = sections.find((sec) => sec.SectionName === soapType);
+        if (!soapSection) {
+            soapSection = {
+                SectionName: soapType,
+                Summary: [],
+            };
+            sections.push(soapSection);
+        }
+        soapSection.Summary.push(
+            ...section.Summary.map((summary) => ({ ...summary, OriginalCategory: section.SectionName }))
+        );
+
         return document;
     };
 
