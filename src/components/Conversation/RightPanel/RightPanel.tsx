@@ -30,7 +30,7 @@ type RightPanelProps = {
     highlightId: HighlightId;
     setHighlightId: React.Dispatch<React.SetStateAction<HighlightId>>;
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
-    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
+    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
 };
 
 export default function RightPanel({
