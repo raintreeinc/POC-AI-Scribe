@@ -29,7 +29,7 @@ type SummarizedConceptsProps = {
         [key: string]: ITranscriptSegments;
     };
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
-    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
+    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
 };
 
 export default function SummarizedConcepts({
@@ -44,10 +44,12 @@ export default function SummarizedConcepts({
 }: SummarizedConceptsProps) {
     const [currentId, setCurrentId] = useState(0);
     const [currentSegment, setCurrentSegment] = useState<string>('');
+    const [currentSection, setCurrentSection] = useState<string>('');
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const toggleDialog = () => {
+    const toggleDialog = (sectionName: string) => {
         setIsDialogOpen(!isDialogOpen);
+        setCurrentSection(sectionName);
     };
 
     // Unset current segment when the highlight is removed, i.e. the current audio time is outside the summarization
@@ -126,7 +128,7 @@ export default function SummarizedConcepts({
                         <TextContent>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <h3 style={{ marginTop: '10px' }}>{toTitleCase(SectionName.replace(/_/g, ' '))}</h3>
-                                <Button iconName="add-plus" variant="icon" onClick={toggleDialog} />
+                                <Button iconName="add-plus" variant="icon" onClick={() => toggleDialog(SectionName)} />
                             </div>
                         </TextContent>
                         <SummaryListDefault
@@ -142,7 +144,8 @@ export default function SummarizedConcepts({
             })}
             <NewSection
                 isOpen={isDialogOpen}
-                onClose={toggleDialog}
+                onClose={() => toggleDialog(currentSection)}
+                currentSection={currentSection}
                 sectionNames={sectionNames}
                 handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
             />

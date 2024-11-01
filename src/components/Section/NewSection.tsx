@@ -9,7 +9,8 @@ interface NewSectionProps {
     isOpen: boolean;
     onClose: () => void;
     sectionNames: string[];
-    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection) => void;
+    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
+    currentSection: string;
 }
 
 const NewSection: React.FC<NewSectionProps> = ({
@@ -17,6 +18,7 @@ const NewSection: React.FC<NewSectionProps> = ({
     onClose,
     sectionNames,
     handleAddSectionToClinicalDocument,
+    currentSection,
 }) => {
     const [selectedName, setSelectedName] = useState<OptionDefinition | null>(null);
     const [note, setNote] = useState('');
@@ -32,7 +34,7 @@ const NewSection: React.FC<NewSectionProps> = ({
                 },
             ],
         };
-        handleAddSectionToClinicalDocument(newSection);
+        handleAddSectionToClinicalDocument(newSection, currentSection);
         onClose();
     };
 

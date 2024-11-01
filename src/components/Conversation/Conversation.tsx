@@ -163,7 +163,8 @@ export default function Conversation() {
 
     const addSectionToClinicalDocument = (
         section: IAuraClinicalDocOutputSection | null,
-        document: IAuraClinicalDocOutput | null
+        document: IAuraClinicalDocOutput | null,
+        currentSection: string
     ) => {
         if (!document || !section) return document;
 
@@ -171,7 +172,7 @@ export default function Conversation() {
         if (!soapType) return document;
 
         const sections = document.ClinicalDocumentation.Sections || [];
-        let soapSection = sections.find((sec) => sec.SectionName === soapType);
+        let soapSection = sections.find((sec) => sec.SectionName === currentSection);
         if (!soapSection) {
             soapSection = {
                 SectionName: soapType,
@@ -202,7 +203,6 @@ export default function Conversation() {
 
             return updatedDocument;
         });
-        getJob(conversationName || '').catch(console.error);
     };
 
     return (
@@ -251,8 +251,10 @@ export default function Conversation() {
                     highlightId={highlightId}
                     setHighlightId={setHighlightId}
                     wavesurfer={wavesurfer}
-                    handleAddSectionToClinicalDocument={(section) =>
-                        updateSectionToClinicalDocument(section, addSectionToClinicalDocument)
+                    handleAddSectionToClinicalDocument={(section, currentSection) =>
+                        updateSectionToClinicalDocument(section, (section, document) =>
+                            addSectionToClinicalDocument(section, document, currentSection)
+                        )
                     }
                 />
             </Grid>
