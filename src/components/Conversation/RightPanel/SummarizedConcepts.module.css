@@ -63,3 +63,8 @@
 .summaryTable {
     width: 100%;
 }
+
+.deleteSection:hover {
+    background-color: rgba(82, 239, 234, 0.25);
+    cursor: pointer;
+}

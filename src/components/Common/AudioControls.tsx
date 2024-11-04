@@ -114,7 +114,7 @@ export default function AudioControls({
             <div className={styles.playerControlInline}>{buttons}</div>
         ) : (
             <div className={styles.playerControl}>
-                <Container>{buttons}</Container>
+                <div>{buttons}</div>
             </div>
         );
     } else {

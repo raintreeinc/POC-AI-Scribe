@@ -30,6 +30,7 @@ type SummarizedConceptsProps = {
     };
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
     handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
+    handleDeleteSelectedSection: (sectionName: IAuraClinicalDocOutputSection, sectionIndex: number) => void;
 };
 
 export default function SummarizedConcepts({
@@ -41,6 +42,7 @@ export default function SummarizedConcepts({
     segmentById,
     wavesurfer,
     handleAddSectionToClinicalDocument,
+    handleDeleteSelectedSection,
 }: SummarizedConceptsProps) {
     const [currentId, setCurrentId] = useState(0);
     const [currentSegment, setCurrentSegment] = useState<string>('');
@@ -138,6 +140,7 @@ export default function SummarizedConcepts({
                             acceptableConfidence={acceptableConfidence}
                             currentSegment={currentSegment}
                             handleSegmentClick={handleSegmentClick}
+                            handleDeleteSelectedSection={handleDeleteSelectedSection}
                         />
                     </div>
                 );
