@@ -64,7 +64,7 @@ const NewSection: React.FC<NewSectionProps> = ({
                     <Button variant="link" onClick={handleCancel}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleSave} disabled={!selectedName || !note}>
+                    <Button variant="primary" onClick={handleSave} disabled={!selectedName || !note.trim()}>
                         Save
                     </Button>
                 </div>
