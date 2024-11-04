@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button, FormField, Modal, Select, Textarea } from '@cloudscape-design/components';
 import { OptionDefinition } from '@cloudscape-design/components/internal/components/option/interfaces';
@@ -19,6 +19,14 @@ const EditSection: React.FC<NewSectionProps> = ({ isOpen, onClose, section, sect
         label: section.OriginalCategory,
     });
     const [note, setNote] = useState(section.SummarizedSegment);
+
+    useEffect(() => {
+        setSelectedName({
+            value: section.OriginalCategory,
+            label: section.OriginalCategory,
+        });
+        setNote(section.SummarizedSegment);
+    }, [section]);
 
     // const handleSave = async () => {
     //     const newSection: IAuraClinicalDocOutputSection = {
