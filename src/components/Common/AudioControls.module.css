@@ -4,9 +4,9 @@
 }
 
 .playerControl {
-    position: 'relative';
-    top: 20%;
-    z-index: 100;
+    width: 300px;
+    margin-top: -31px;
+    margin-left: calc(100% - 300px);
 }
 
 .playerControlInline {
