@@ -1,15 +1,15 @@
 import React from 'react';
 
 import * as awsui from '@cloudscape-design/design-tokens';
+import { Button, Icon, Modal, SpaceBetween } from '@cloudscape-design/components';
 import Box from '@cloudscape-design/components/box';
 
 import { SegmentExtractedData } from '@/types/ComprehendMedical';
-import { IEvidence } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutputSection, IEvidence } from '@/types/HealthScribe';
 
 import styles from './SummarizedConcepts.module.css';
 import { ExtractedHealthDataWord } from './SummaryListComponents';
 import { processSummarizedSegment } from './summarizedConceptsUtils';
-import { Icon } from '@cloudscape-design/components';
 
 function NoEntities() {
     return (
@@ -26,7 +26,9 @@ type SummaryListDefaultProps = {
     acceptableConfidence: number;
     currentSegment: string;
     handleSegmentClick: (SummarizedSegment: string, EvidenceLinks: { SegmentId: string }[]) => void;
+    handleDeleteSelectedSection: (sectionName: IAuraClinicalDocOutputSection, sectionIndex: number) => void;
 };
+
 export function SummaryListDefault({
     sectionName,
     summary,
@@ -34,10 +36,45 @@ export function SummaryListDefault({
     acceptableConfidence,
     currentSegment = '',
     handleSegmentClick,
+    handleDeleteSelectedSection,
 }: SummaryListDefaultProps) {
+    const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [sectionToDelete, setSectionToDelete] = React.useState<IEvidence | null>(null);
+    const [sectionIndexToDelete, setSectionIndexToDelete] = React.useState<number | null>(null);
+    const [currentSummary, setCurrentSummary] = React.useState<IAuraClinicalDocOutputSection>({
+        SectionName: '',
+        Summary: []
+    });
+
+    const handleDeleteSection = () => {
+
+        if (sectionToDelete && sectionIndexToDelete !== null) {
+            handleDeleteSelectedSection(currentSummary, sectionIndexToDelete);
+        }
+
+        setShowDeleteModal(false)
+    }
+
     if (summary.length) {
         return (
             <table className={styles.summaryTable}>
+                <Modal
+                    visible={showDeleteModal}
+                    onDismiss={() => setShowDeleteModal(false)}
+                    header="Please confirm that you want to delete the section"
+                    footer={
+                        <Box float="right">
+                            <SpaceBetween direction="horizontal" size="xs">
+                                <Button variant="link" onClick={handleDeleteSection}>
+                                    Delete
+                                </Button>
+                                <Button variant="link" onClick={() => setShowDeleteModal(false)}>
+                                    Cancel
+                                </Button>
+                            </SpaceBetween>
+                        </Box>
+                    }
+                ></Modal>
                 <thead>
                     <tr>
                         <th>Area</th>
@@ -45,7 +82,10 @@ export function SummaryListDefault({
                         <th></th>
                     </tr>
                 </thead>
-                {summary.map(({ EvidenceLinks, SummarizedSegment, OriginalCategory }, sectionIndex) => {
+                {summary.map((section, sectionIndex) => {
+                    const { OriginalCategory, EvidenceLinks } = section;
+                    let SummarizedSegment = section.SummarizedSegment;
+
                     if (SummarizedSegment === '') return false;
 
                     // Check if the segment is a section header
@@ -125,7 +165,6 @@ export function SummaryListDefault({
                                             <Icon name="remove" size="medium" />
                                         </div>
                                     </td>
-                                    
                                 </tr>
                             </>
                         );
@@ -154,13 +193,20 @@ export function SummaryListDefault({
                                         <div>
                                             <Icon name="edit" size="medium" />
                                         </div>
-                                        <div>
-                                            <Icon name="remove" size="medium" />
+                                        <div
+                                            className={styles.deleteSection}
+                                            onClick={() => {
+                                                setSectionToDelete(section);
+                                                setSectionIndexToDelete(sectionIndex);
+                                                setCurrentSummary({ SectionName: sectionName, Summary: summary });
+                                                setShowDeleteModal(true);
+                                            }}
+                                        >
+                                            <Icon name="remove" size="medium" variant='error' />
                                         </div>
                                     </td>
                                 </tr>
                             </>
-                            
                         );
                     }
                 })}
