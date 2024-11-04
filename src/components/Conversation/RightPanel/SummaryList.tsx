@@ -161,8 +161,16 @@ export function SummaryListDefault({
                                         <div>
                                             <Icon name="edit" size="medium" />
                                         </div>
-                                        <div>
-                                            <Icon name="remove" size="medium" />
+                                        <div
+                                            className={styles.deleteSection}
+                                            onClick={() => {
+                                                setSectionToDelete(section);
+                                                setSectionIndexToDelete(sectionIndex);
+                                                setCurrentSummary({ SectionName: sectionName, Summary: summary });
+                                                setShowDeleteModal(true);
+                                            }}
+                                        >
+                                            <Icon name="remove" size="medium" variant='error' />
                                         </div>
                                     </td>
                                 </tr>
