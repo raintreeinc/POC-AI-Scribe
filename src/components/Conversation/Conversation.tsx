@@ -187,6 +187,20 @@ export default function Conversation() {
         return document;
     };
 
+    const deleteSectionFromClinicalDocument = (
+        section: IAuraClinicalDocOutputSection | null,
+        document: IAuraClinicalDocOutput | null,
+        sectionIndex: number,
+    ) => {
+        if (!document || !section) return document;
+
+        document.ClinicalDocumentation.Sections.find(
+            (current) => current.SectionName === section.SectionName
+        )?.Summary.splice(Number(sectionIndex), 1);
+
+        return document;
+    }
+
     const updateSectionToClinicalDocument = async (
         section: IAuraClinicalDocOutputSection,
         updateFunction: (
@@ -254,6 +268,11 @@ export default function Conversation() {
                     handleAddSectionToClinicalDocument={(section, currentSection) =>
                         updateSectionToClinicalDocument(section, (section, document) =>
                             addSectionToClinicalDocument(section, document, currentSection)
+                        )
+                    }
+                    handleDeleteSelectedSection={(section, sectionIndex) =>
+                        updateSectionToClinicalDocument(section, (section, document) =>
+                            deleteSectionFromClinicalDocument(section, document, sectionIndex)
                         )
                     }
                 />
