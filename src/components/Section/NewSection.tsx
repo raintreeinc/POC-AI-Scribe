@@ -36,10 +36,17 @@ const NewSection: React.FC<NewSectionProps> = ({
         };
         handleAddSectionToClinicalDocument(newSection, currentSection);
         onClose();
+        cleanFields();
     };
 
     const handleCancel = () => {
         onClose();
+        cleanFields();
+    };
+
+    const cleanFields = () => {
+        setSelectedName(null);
+        setNote('');
     };
 
     const sectionOptions = sectionNames.map((name) => ({
