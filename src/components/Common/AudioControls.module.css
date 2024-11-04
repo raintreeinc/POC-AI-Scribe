@@ -5,7 +5,8 @@
 
 .playerControl {
     width: 300px;
-    margin-top: -31px;
+    margin-top: -39px;
+    margin-bottom: 8px;
     margin-left: calc(100% - 300px);
 }
 
