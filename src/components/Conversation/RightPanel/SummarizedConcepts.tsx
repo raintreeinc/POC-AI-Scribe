@@ -134,6 +134,7 @@ export default function SummarizedConcepts({
                             </div>
                         </TextContent>
                         <SummaryListDefault
+                            sectionNames={sectionNames}
                             sectionName={SectionName}
                             summary={Summary}
                             summaryExtractedHealthData={sectionExtractedHealthData?.Summary}

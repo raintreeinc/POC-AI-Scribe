@@ -70,7 +70,7 @@ const NewSection: React.FC<NewSectionProps> = ({
                 </div>
             }
         >
-            <FormField label="Name">
+            <FormField label="Area">
                 <Select
                     selectedOption={selectedName || null}
                     onChange={({ detail }) => setSelectedName(detail.selectedOption)}

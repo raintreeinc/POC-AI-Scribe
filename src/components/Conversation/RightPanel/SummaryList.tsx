@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import * as awsui from '@cloudscape-design/design-tokens';
 import { Button, Icon, Modal, SpaceBetween } from '@cloudscape-design/components';
 import Box from '@cloudscape-design/components/box';
 
+import EditSection from '@/components/Section/EditSection';
 import { SegmentExtractedData } from '@/types/ComprehendMedical';
 import { IAuraClinicalDocOutputSection, IEvidence } from '@/types/HealthScribe';
 
@@ -20,6 +21,7 @@ function NoEntities() {
 }
 
 type SummaryListDefaultProps = {
+    sectionNames: string[];
     sectionName: string;
     summary: IEvidence[];
     summaryExtractedHealthData?: SegmentExtractedData[];
@@ -30,6 +32,7 @@ type SummaryListDefaultProps = {
 };
 
 export function SummaryListDefault({
+    sectionNames,
     sectionName,
     summary,
     summaryExtractedHealthData,
@@ -39,21 +42,29 @@ export function SummaryListDefault({
     handleDeleteSelectedSection,
 }: SummaryListDefaultProps) {
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [sectionToDelete, setSectionToDelete] = React.useState<IEvidence | null>(null);
     const [sectionIndexToDelete, setSectionIndexToDelete] = React.useState<number | null>(null);
+    const [sectionToEdit, setSectionToEdit] = React.useState<IEvidence | null>(null);
+    const [sectionIndexToEdit, setSectionIndexToEdit] = React.useState<number | null>(null);
     const [currentSummary, setCurrentSummary] = React.useState<IAuraClinicalDocOutputSection>({
         SectionName: '',
-        Summary: []
+        Summary: [],
     });
 
-    const handleDeleteSection = () => {
+    useEffect(() => {
+        if (sectionToEdit) {
+            console.log('sectionToEdit1', sectionToEdit);
+        }
+    }, [sectionToEdit]);
 
+    const handleDeleteSection = () => {
         if (sectionToDelete && sectionIndexToDelete !== null) {
             handleDeleteSelectedSection(currentSummary, sectionIndexToDelete);
         }
 
-        setShowDeleteModal(false)
-    }
+        setShowDeleteModal(false);
+    };
 
     if (summary.length) {
         return (
@@ -75,6 +86,15 @@ export function SummaryListDefault({
                         </Box>
                     }
                 ></Modal>
+                {sectionToEdit && sectionIndexToEdit !== null && (
+                    <EditSection 
+                        isOpen={showEditModal} 
+                        onClose={() => setShowEditModal(false)} 
+                        section={sectionToEdit} 
+                        sectionIndex={sectionIndexToEdit}
+                        sectionNames={sectionNames}
+                    />
+                )}
                 <thead>
                     <tr>
                         <th>Area</th>
@@ -131,9 +151,7 @@ export function SummaryListDefault({
                                     </tr>
                                 )}
                                 <tr className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
-                                    <td>
-                                        {OriginalCategory}
-                                    </td>
+                                    <td>{OriginalCategory}</td>
                                     <td>
                                         <div
                                             onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
@@ -173,14 +191,14 @@ export function SummaryListDefault({
                             <>
                                 {sectionHeader && (
                                     <tr>
-                                        <td colSpan={3} className={styles.summaryListItemSubHeader}>{sectionHeader}</td>
+                                        <td colSpan={3} className={styles.summaryListItemSubHeader}>
+                                            {sectionHeader}
+                                        </td>
                                     </tr>
                                 )}
                                 <tr className={`${styles.summaryListItem} ${indent && styles.summaryListItemIndent}`}>
-                                    <td>
-                                        {OriginalCategory}
-                                    </td>
-                                    <td width='100%'>
+                                    <td>{OriginalCategory}</td>
+                                    <td width="100%">
                                         <div
                                             onClick={() => handleSegmentClick(SummarizedSegment, EvidenceLinks)}
                                             className={styles.summarizedSegment}
@@ -190,7 +208,15 @@ export function SummaryListDefault({
                                         </div>
                                     </td>
                                     <td>
-                                        <div>
+                                        <div
+                                            onClick={() => {
+                                                // console.log('clicked')
+                                                setSectionToEdit(section);
+                                                setSectionIndexToEdit(sectionIndex);
+                                                setCurrentSummary({ SectionName: sectionName, Summary: summary });
+                                                setShowEditModal(true);
+                                            }}
+                                        >
                                             <Icon name="edit" size="medium" />
                                         </div>
                                         <div
@@ -202,7 +228,7 @@ export function SummaryListDefault({
                                                 setShowDeleteModal(true);
                                             }}
                                         >
-                                            <Icon name="remove" size="medium" variant='error' />
+                                            <Icon name="remove" size="medium" variant="error" />
                                         </div>
                                     </td>
                                 </tr>
