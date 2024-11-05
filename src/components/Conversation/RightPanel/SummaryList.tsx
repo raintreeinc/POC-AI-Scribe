@@ -98,7 +98,11 @@ export function SummaryListDefault({
                 {sectionToEdit && sectionIndexToEdit !== null && (
                     <EditSection 
                         isOpen={showEditModal} 
-                        onClose={() => setShowEditModal(false)} 
+                        onClose={() => {
+                            setShowEditModal(false)
+                            setSectionToEdit(null)
+                            setSectionIndexToEdit(null)
+                        }} 
                         section={currentSummary} 
                         sectionIndex={sectionIndexToEdit}
                         sectionNames={sectionNames}
