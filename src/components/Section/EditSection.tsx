@@ -28,10 +28,10 @@ const EditSection: React.FC<NewSectionProps> = ({
     handleEditSelectedSection,
 }) => {
     const [selectedName, setSelectedName] = useState<OptionDefinition | null>({
-        value: section.Summary[sectionIndex].OriginalCategory,
-        label: section.Summary[sectionIndex].OriginalCategory,
+        value: section.Summary[sectionIndex]?.OriginalCategory ?? undefined,
+        label: section.Summary[sectionIndex]?.OriginalCategory ?? undefined,
     });
-    const [note, setNote] = useState(section.Summary[sectionIndex].SummarizedSegment);
+    const [note, setNote] = useState(section.Summary[sectionIndex]?.SummarizedSegment ?? null);
 
     useEffect(() => {
         setSelectedName({
