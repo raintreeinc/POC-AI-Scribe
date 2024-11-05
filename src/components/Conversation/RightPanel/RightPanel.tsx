@@ -104,16 +104,16 @@ export default function RightPanel({
         return (
             <ScrollingContainer
                 containerTitle="Insights"
-                containerActions={
-                    <RightPanelActions
-                        hasInsightSections={hasInsightSections}
-                        dataExtracted={extractedHealthData.length > 0}
-                        extractingData={extractingData}
-                        clinicalDocumentNereUnits={clinicalDocumentNereUnits}
-                        setRightPanelSettingsOpen={setRightPanelSettingsOpen}
-                        handleExtractHealthData={handleExtractHealthData}
-                    />
-                }
+                // containerActions={
+                //     <RightPanelActions
+                //         hasInsightSections={hasInsightSections}
+                //         dataExtracted={extractedHealthData.length > 0}
+                //         extractingData={extractingData}
+                //         clinicalDocumentNereUnits={clinicalDocumentNereUnits}
+                //         setRightPanelSettingsOpen={setRightPanelSettingsOpen}
+                //         handleExtractHealthData={handleExtractHealthData}
+                //     />
+                // }
             >
                 <RightPanelSettings
                     rightPanelSettingsOpen={rightPanelSettingsOpen}
