@@ -199,7 +199,25 @@ export default function Conversation() {
         )?.Summary.splice(Number(sectionIndex), 1);
 
         return document;
-    }
+    };
+
+    const editSectionFromClinicalDocument = (
+        section: IAuraClinicalDocOutputSection | null,
+        document: IAuraClinicalDocOutput | null,
+        sectionIndex: number,
+        name: string | undefined,
+        note: string,
+    ) => {
+        if (!document || !section || !name || !note) return document;
+        const targetSection = document.ClinicalDocumentation.Sections.find(
+            (current) => current.SectionName === section.SectionName
+        );
+        if (targetSection) {
+            targetSection.Summary[sectionIndex].OriginalCategory = name;
+            targetSection.Summary[sectionIndex].SummarizedSegment = note;
+        }
+        return document;
+    };
 
     const updateSectionToClinicalDocument = async (
         section: IAuraClinicalDocOutputSection,
@@ -273,6 +291,11 @@ export default function Conversation() {
                     handleDeleteSelectedSection={(section, sectionIndex) =>
                         updateSectionToClinicalDocument(section, (section, document) =>
                             deleteSectionFromClinicalDocument(section, document, sectionIndex)
+                        )
+                    }
+                    handleEditSelectedSection={(section, sectionIndex, name, note) =>
+                        updateSectionToClinicalDocument(section, (section, document) =>
+                            editSectionFromClinicalDocument(section, document, sectionIndex, name, note)
                         )
                     }
                 />

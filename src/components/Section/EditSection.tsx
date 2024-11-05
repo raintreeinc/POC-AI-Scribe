@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button, FormField, Modal, Select, Textarea } from '@cloudscape-design/components';
 import { OptionDefinition } from '@cloudscape-design/components/internal/components/option/interfaces';
@@ -8,33 +8,41 @@ import { IAuraClinicalDocOutputSection } from '@/types/HealthScribe';
 interface NewSectionProps {
     isOpen: boolean;
     onClose: () => void;
+    section: IAuraClinicalDocOutputSection;
+    sectionIndex: number;
     sectionNames: string[];
-    handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
-    currentSection: string;
+    handleEditSelectedSection: (
+        sectionName: IAuraClinicalDocOutputSection,
+        sectionIndex: number,
+        name: string | undefined,
+        note: string
+    ) => void;
 }
 
-const NewSection: React.FC<NewSectionProps> = ({
+const EditSection: React.FC<NewSectionProps> = ({
     isOpen,
     onClose,
+    section,
+    sectionIndex,
     sectionNames,
-    handleAddSectionToClinicalDocument,
-    currentSection,
+    handleEditSelectedSection,
 }) => {
-    const [selectedName, setSelectedName] = useState<OptionDefinition | null>(null);
-    const [note, setNote] = useState('');
+    const [selectedName, setSelectedName] = useState<OptionDefinition | null>({
+        value: section.Summary[sectionIndex].OriginalCategory,
+        label: section.Summary[sectionIndex].OriginalCategory,
+    });
+    const [note, setNote] = useState(section.Summary[sectionIndex].SummarizedSegment);
 
-    const handleSave = async () => {
-        const newSection: IAuraClinicalDocOutputSection = {
-            SectionName: selectedName?.value || '',
-            Summary: [
-                {
-                    EvidenceLinks: [],
-                    SummarizedSegment: note,
-                    OriginalCategory: selectedName?.value || '',
-                },
-            ],
-        };
-        handleAddSectionToClinicalDocument(newSection, currentSection);
+    useEffect(() => {
+        setSelectedName({
+            value: section.Summary[sectionIndex].OriginalCategory,
+            label: section.Summary[sectionIndex].OriginalCategory,
+        });
+        setNote(section.Summary[sectionIndex].SummarizedSegment);
+    }, [section]);
+
+    const handleSave = () => {
+        handleEditSelectedSection(section, sectionIndex, selectedName?.value, note);
         onClose();
         cleanFields();
     };
@@ -58,7 +66,7 @@ const NewSection: React.FC<NewSectionProps> = ({
         <Modal
             visible={isOpen}
             onDismiss={handleCancel}
-            header="Add New Section"
+            header="Edit Note"
             footer={
                 <div>
                     <Button variant="link" onClick={handleCancel}>
@@ -72,21 +80,16 @@ const NewSection: React.FC<NewSectionProps> = ({
         >
             <FormField label="Area">
                 <Select
-                    selectedOption={selectedName || null}
+                    selectedOption={selectedName}
                     onChange={({ detail }) => setSelectedName(detail.selectedOption)}
                     options={sectionOptions}
-                    placeholder="Select a name"
                 />
             </FormField>
             <FormField label="Note">
-                <Textarea
-                    value={note}
-                    onChange={({ detail }) => setNote(detail.value)}
-                    placeholder="Enter your note here"
-                />
+                <Textarea value={note} onChange={({ detail }) => setNote(detail.value)} />
             </FormField>
         </Modal>
     );
 };
 
-export default NewSection;
+export default EditSection;

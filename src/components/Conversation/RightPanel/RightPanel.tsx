@@ -32,6 +32,12 @@ type RightPanelProps = {
     wavesurfer: React.MutableRefObject<WaveSurfer | undefined>;
     handleAddSectionToClinicalDocument: (sectionName: IAuraClinicalDocOutputSection, currentSection: string) => void;
     handleDeleteSelectedSection: (sectionName: IAuraClinicalDocOutputSection, sectionIndex: number) => void;
+    handleEditSelectedSection: (
+        sectionName: IAuraClinicalDocOutputSection,
+        sectionIndex: number,
+        name: string | undefined,
+        note: string
+    ) => void;
 };
 
 export default function RightPanel({
@@ -43,6 +49,7 @@ export default function RightPanel({
     wavesurfer,
     handleAddSectionToClinicalDocument,
     handleDeleteSelectedSection,
+    handleEditSelectedSection,
 }: RightPanelProps) {
     const [extractingData, setExtractingData] = useState<boolean>(false);
     const [extractedHealthData, setExtractedHealthData] = useState<ExtractedHealthData[]>([]);
@@ -124,6 +131,7 @@ export default function RightPanel({
                     wavesurfer={wavesurfer}
                     handleAddSectionToClinicalDocument={handleAddSectionToClinicalDocument}
                     handleDeleteSelectedSection={handleDeleteSelectedSection}
+                    handleEditSelectedSection={handleEditSelectedSection}
                 />
             </ScrollingContainer>
         );
