@@ -4,10 +4,10 @@
 }
 
 .playerControl {
-    width: 300px;
+    width: 340px;
     margin-top: -39px;
     margin-bottom: 8px;
-    margin-left: calc(100% - 300px);
+    margin-left: calc(100% - 340px);
 }
 
 .playerControlInline {
