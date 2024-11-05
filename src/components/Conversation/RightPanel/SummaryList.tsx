@@ -29,6 +29,12 @@ type SummaryListDefaultProps = {
     currentSegment: string;
     handleSegmentClick: (SummarizedSegment: string, EvidenceLinks: { SegmentId: string }[]) => void;
     handleDeleteSelectedSection: (sectionName: IAuraClinicalDocOutputSection, sectionIndex: number) => void;
+    handleEditSelectedSection: (
+        sectionName: IAuraClinicalDocOutputSection,
+        sectionIndex: number,
+        name: string | undefined,
+        note: string
+    ) => void;
 };
 
 export function SummaryListDefault({
@@ -40,6 +46,7 @@ export function SummaryListDefault({
     currentSegment = '',
     handleSegmentClick,
     handleDeleteSelectedSection,
+    handleEditSelectedSection,
 }: SummaryListDefaultProps) {
     const [showDeleteModal, setShowDeleteModal] = React.useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -53,10 +60,12 @@ export function SummaryListDefault({
     });
 
     useEffect(() => {
-        if (sectionToEdit) {
-            console.log('sectionToEdit1', sectionToEdit);
-        }
+        // Empty useEffect to trigger updates
     }, [sectionToEdit]);
+
+    useEffect(() => {
+        // Empty useEffect to trigger updates
+    }, [currentSummary]);
 
     const handleDeleteSection = () => {
         if (sectionToDelete && sectionIndexToDelete !== null) {
@@ -90,9 +99,10 @@ export function SummaryListDefault({
                     <EditSection 
                         isOpen={showEditModal} 
                         onClose={() => setShowEditModal(false)} 
-                        section={sectionToEdit} 
+                        section={currentSummary} 
                         sectionIndex={sectionIndexToEdit}
                         sectionNames={sectionNames}
+                        handleEditSelectedSection={handleEditSelectedSection}
                     />
                 )}
                 <thead>
@@ -210,7 +220,6 @@ export function SummaryListDefault({
                                     <td>
                                         <div
                                             onClick={() => {
-                                                // console.log('clicked')
                                                 setSectionToEdit(section);
                                                 setSectionIndexToEdit(sectionIndex);
                                                 setCurrentSummary({ SectionName: sectionName, Summary: summary });

@@ -3,46 +3,49 @@ import React, { useEffect, useState } from 'react';
 import { Button, FormField, Modal, Select, Textarea } from '@cloudscape-design/components';
 import { OptionDefinition } from '@cloudscape-design/components/internal/components/option/interfaces';
 
-import { IEvidence } from '@/types/HealthScribe';
+import { IAuraClinicalDocOutputSection } from '@/types/HealthScribe';
 
 interface NewSectionProps {
     isOpen: boolean;
     onClose: () => void;
-    section: IEvidence;
+    section: IAuraClinicalDocOutputSection;
     sectionIndex: number;
     sectionNames: string[];
+    handleEditSelectedSection: (
+        sectionName: IAuraClinicalDocOutputSection,
+        sectionIndex: number,
+        name: string | undefined,
+        note: string
+    ) => void;
 }
 
-const EditSection: React.FC<NewSectionProps> = ({ isOpen, onClose, section, sectionIndex, sectionNames }) => {
+const EditSection: React.FC<NewSectionProps> = ({
+    isOpen,
+    onClose,
+    section,
+    sectionIndex,
+    sectionNames,
+    handleEditSelectedSection,
+}) => {
     const [selectedName, setSelectedName] = useState<OptionDefinition | null>({
-        value: section.OriginalCategory,
-        label: section.OriginalCategory,
+        value: section.Summary[sectionIndex].OriginalCategory,
+        label: section.Summary[sectionIndex].OriginalCategory,
     });
-    const [note, setNote] = useState(section.SummarizedSegment);
+    const [note, setNote] = useState(section.Summary[sectionIndex].SummarizedSegment);
 
     useEffect(() => {
         setSelectedName({
-            value: section.OriginalCategory,
-            label: section.OriginalCategory,
+            value: section.Summary[sectionIndex].OriginalCategory,
+            label: section.Summary[sectionIndex].OriginalCategory,
         });
-        setNote(section.SummarizedSegment);
+        setNote(section.Summary[sectionIndex].SummarizedSegment);
     }, [section]);
 
-    // const handleSave = async () => {
-    //     const newSection: IAuraClinicalDocOutputSection = {
-    //         SectionName: selectedName?.value || '',
-    //         Summary: [
-    //             {
-    //                 EvidenceLinks: [],
-    //                 SummarizedSegment: note,
-    //                 OriginalCategory: selectedName?.value || '',
-    //             },
-    //         ],
-    //     };
-    //     handleAddSectionToClinicalDocument(newSection, currentSection);
-    //     onClose();
-    //     cleanFields();
-    // };
+    const handleSave = () => {
+        handleEditSelectedSection(section, sectionIndex, selectedName?.value, note);
+        onClose();
+        cleanFields();
+    };
 
     const handleCancel = () => {
         onClose();
@@ -69,7 +72,7 @@ const EditSection: React.FC<NewSectionProps> = ({ isOpen, onClose, section, sect
                     <Button variant="link" onClick={handleCancel}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={() => {}} disabled={!selectedName || !note.trim()}>
+                    <Button variant="primary" onClick={handleSave} disabled={!selectedName || !note.trim()}>
                         Save
                     </Button>
                 </div>
