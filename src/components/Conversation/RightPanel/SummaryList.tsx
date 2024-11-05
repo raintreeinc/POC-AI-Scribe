@@ -186,7 +186,14 @@ export function SummaryListDefault({
                                         </div>
                                     </td>
                                     <td>
-                                        <div>
+                                        <div
+                                            onClick={() => {
+                                                setSectionToEdit(section);
+                                                setSectionIndexToEdit(sectionIndex);
+                                                setCurrentSummary({ SectionName: sectionName, Summary: summary });
+                                                setShowEditModal(true);
+                                            }}
+                                        >
                                             <Icon name="edit" size="medium" />
                                         </div>
                                         <div
